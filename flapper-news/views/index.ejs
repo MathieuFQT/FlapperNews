@@ -41,15 +41,8 @@
         <span class="glyphicon glyphicon-thumbs-up" ng-click="incrementUpvotes(post)"></span>
         {{post.upvotes}}
         <span style="margin-left:10px; font-size:20px;">
-          
-          <!--
-          Finally we need to modify the ng-repeat section to make the title a link to the content, but only if a link was specified.
-          we will do this by using a new directive called ng-hide, which hides elements when an Angular expression evaluates to true.
-          -->
 
           <a href={{post.link}} ng-show="post.link">{{post.title}}</a>
-          <!--a href moet  {{post.link}} zijn anders gaat  naar post.link en niet naar de value die post.link bevat
-          {{$index}}  toont de index-->
 
           <span ng-hide="post.link">{{post.title}}</span>
           <span><a href="#/posts/{{post._id}}">comments</a></span>
