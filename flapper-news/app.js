@@ -16,6 +16,11 @@ require('./models/Comments');
 //Make connection for mongo
 mongoose.connect('mongodb://localhost/news');
 
+//require passport after mongoose
+var passport = require('passport');
+require('./models/Users');
+require('./config/passport');
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -27,6 +32,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(passport.initialize());
 
 app.use('/', routes);
 app.use('/users', users);
