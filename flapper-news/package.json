@@ -1,7 +1,7 @@
 {
   "name": "flapper-news",
   "version": "0.0.0",
-  "private": true,
+  "private": false,
   "scripts": {
     "start": "node ./bin/www"
   },
@@ -14,5 +14,22 @@
     "mongoose": "^4.2.7",
     "morgan": "~1.6.1",
     "serve-favicon": "~2.3.0"
-  }
+  },
+  "description": "flapperV0",
+  "main": "app.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MathieuFQT/FlapperNews.git"
+  },
+  "keywords": [
+    "Flapper",
+    "News"
+  ],
+  "author": "MathieuFQT",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MathieuFQT/FlapperNews/issues"
+  },
+  "homepage": "https://github.com/MathieuFQT/FlapperNews#readme"
 }

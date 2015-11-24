@@ -19,6 +19,7 @@ var app= angular.module('flapperNews',['ui.router']);
   });
 
 */
+
 app.controller ('MainCtrl',['$scope','posts',
   function($scope,posts)
   {
@@ -27,11 +28,9 @@ app.controller ('MainCtrl',['$scope','posts',
     $scope.addPost = function ()
     {
       if(!$scope.title || $scope.title ===''){return;}
-      $scope.posts.push({
+      $scope.posts.create({
         title: $scope.title,
-        link: $scope.link,
-        upvotes:0,
-        comments:[]
+        link: $scope.link
       });
       $scope.title='';
       $scope.link='';
@@ -40,7 +39,7 @@ app.controller ('MainCtrl',['$scope','posts',
     $scope.incrementUpvotes=function(post)
     {
       // console.log('In incrementUpvotes post Object:',post);  voegt een log toe, je kan er controles in steken
-      post.upvotes+=1;
+      post.upvotes(post);
     }
   }]);
 
@@ -50,13 +49,51 @@ You may be wondering why we're using the keyword factory instead of service.
 In angular, factory and service are related in that they are both instances of a third entity called provider.
 */
 
-app.factory('posts',[function()
+app.factory('posts',[function($http)
   {
     var postFactory=
     {
       posts:[]
 
     };
+    //retrieve posts
+    postFactory.getAll = function() {
+      return $http.get('/posts').success(function(data){
+        angular.copy(data, postFactory.posts);
+      });
+    };
+
+    //create new posts
+    postFactory.create = function(post) {
+      return $http.post('/posts', post).success(function(data){
+        postFactory.posts.push(data);
+      });
+    };
+    //upvoting post
+    postFactory.upvote = function(post) {
+      return $http.put('/posts/' + post._id + '/upvote')
+        .success(function(data){
+          post.upvotes += 1;
+        });
+    };
+    //get post by id
+    postFactory.get = function(id) {
+      return $http.get('/posts/' + id).then(function(res){
+        return res.data;
+      });
+    };
+    //add comment
+    postFactory.addComment = function(id, comment) {
+      return $http.post('/posts/' + id + '/comments', comment);
+    };
+    //upvoting comments
+    postFactory.upvoteComment = function(post, comment) {
+      return $http.put('/posts/' + post._id + '/comments/'+ comment._id + '/upvote')
+        .success(function(data){
+          comment.upvotes += 1;
+        });
+    };
+
     return postFactory;
 
   }]);
@@ -79,11 +116,21 @@ app.config([
       url:'/home',
       templateUrl: '/home.html',
       controller: 'MainCtrl'
+      resolve: {
+          postPromise: ['posts', function(posts){
+            return posts.getAll();
+          }]
+        }
     })
     .state('posts',{
       url:'/posts/{id}',
       templateUrl: '/posts.html',
       controller: 'PostCtrl'
+      resolve: {
+        post: ['$stateParams', 'posts', function($stateParams, posts) {
+          return posts.get($stateParams.id);
+        }]
+      }
     });
 
     $urlRouterProvider.otherwise('home');
@@ -92,20 +139,22 @@ app.config([
 );
 
 //We can use $stateParams to retrieve the id from the URL and load the appropriate post.
-app.controller('PostCtrl',['$scope','$stateParams','posts',
-  function($scope,$stateParams,posts)
+app.controller('PostCtrl',['$scope','posts','post',
+  function($scope,posts,post)
   {
-    $scope.post=posts.posts[$stateParams.id];
-
-    $scope.addComment=function()
-    {
-      if($scope.body === ''){return;}
-      $scope.post.comments.push({
-        author:'user',
-        body:$scope.body,
-        upvotes:0
+    $scope.post=post;
+    $scope.addComment = function(){
+      if($scope.body === '') { return; }
+      posts.addComment(post._id, {
+        body: $scope.body,
+        author: 'user'})
+      .success(function(comment) {
+        $scope.post.comments.push(comment);
       });
-      $scope.body='';
+      $scope.body = '';
     };
+    $scope.incrementUpvotes = function(comment){
+      posts.upvoteComment(post, comment);
+    };    
   }]
 );
