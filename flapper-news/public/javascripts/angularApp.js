@@ -1,7 +1,7 @@
 var app= angular.module('flapperNews',['ui.router']);
 
 app.controller ('MainCtrl',['$scope','posts','auth',
-  function($scope,posts)
+  function($scope,posts,auth)
   {
     $scope.isLoggedIn = auth.isLoggedIn;
     $scope.posts=posts.posts;
@@ -9,7 +9,7 @@ app.controller ('MainCtrl',['$scope','posts','auth',
     $scope.addPost = function ()
     {
       if(!$scope.title || $scope.title ===''){return;}
-      $scope.posts.create({
+        posts.create({
         title: $scope.title,
         link: $scope.link
       });
@@ -19,7 +19,7 @@ app.controller ('MainCtrl',['$scope','posts','auth',
 
     $scope.incrementUpvotes=function(post)
     {
-      post.upvotes(post);
+      posts.upvote(post);
     }
   }]);
 
@@ -66,13 +66,13 @@ app.factory('posts',['$http', 'auth',
     //add comment
     postFactory.addComment = function(id, comment) {
       return $http.post('/posts/' + id + '/comments', comment, 
-        {headers: {Authorization: 'Bearer '+auth.getToken()});
+        {headers: {Authorization: 'Bearer '+auth.getToken()}});
     };
 
     //upvoting comments
     postFactory.upvoteComment = function(post, comment) {
       return $http.put('/posts/' + post._id + '/comments/'+ comment._id + '/upvote', null, 
-        {headers: {Authorization: 'Bearer '+auth.getToken()}}))
+        {headers: {Authorization: 'Bearer '+auth.getToken()}})
         .success(function(data){
           comment.upvotes += 1;
         });
@@ -88,7 +88,7 @@ app.config(['$stateProvider', '$urlRouterProvider',
     $stateProvider.state('home',{
       url:'/home',
       templateUrl: '/home.html',
-      controller: 'MainCtrl'
+      controller: 'MainCtrl',
       resolve: {
           postPromise: ['posts', function(posts){
             return posts.getAll();
@@ -98,7 +98,7 @@ app.config(['$stateProvider', '$urlRouterProvider',
     .state('posts',{
       url:'/posts/{id}',
       templateUrl: '/posts.html',
-      controller: 'PostCtrl'
+      controller: 'PostCtrl',
       resolve: {
         post: ['$stateParams', 'posts', function($stateParams, posts) {
           return posts.get($stateParams.id);
@@ -133,14 +133,14 @@ app.config(['$stateProvider', '$urlRouterProvider',
 
 //We can use $stateParams to retrieve the id from the URL and load the appropriate post.
 app.controller('PostCtrl',['$scope','posts','post','auth',
-  function($scope,posts,post)
+  function($scope,posts,post,auth)
   {
-    $scope.isLoggedIn = auth.isLoggedIn;
     $scope.post=post;
+    $scope.isLoggedIn = auth.isLoggedIn;    
     
     $scope.addComment = function(){
       if($scope.body === '') { return; }
-      posts.addComment(post._id, {
+        posts.addComment(post._id, {
         body: $scope.body,
         author: 'user'})
       .success(function(comment) {
@@ -208,7 +208,7 @@ app.factory('auth', ['$http', '$window', function($http, $window){
 );
 
 //controller for login & register
-app..controller('AuthCtrl', ['$scope', '$state','auth',
+app.controller('AuthCtrl', ['$scope', '$state','auth',
   function($scope, $state, auth){
     $scope.user = {};
 

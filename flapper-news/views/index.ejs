@@ -6,8 +6,8 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/>
     <script src="/javascripts/angular.min.js"></script>
-    <script src="/javascripts/angular-ui router.js"></script>
     <script src="/javascripts/angularApp.js"></script>
+    <script src="/javascripts/angular-ui router.js"></script>
 
     <style>
       .glyphicon-thumbs-up:hover{cursor: hand;}
@@ -19,7 +19,7 @@
 
     <nav class="navbar navbar-default pull-right" ng-controller="NavCtrl">
       <ul class="nav navbar-nav">
-        <li ng-show="isLoggedIn()"><a>{{ currentUser() }}</a></li>
+        <li ng-show="isLoggedIn()"><a>User :{{ currentUser() }}</a></li>
         <li ng-show="isLoggedIn()"><a href="" ng-click="logOut()">Log Out</a></li>
         <li ng-hide="isLoggedIn()"><a href="/#/login">Log In</a></li>
         <li ng-hide="isLoggedIn()"><a href="/#/register">Register</a></li>
@@ -73,7 +73,7 @@
     <script type="text/ng-template" id ="/posts.html">
       <div class="page-header">
         <h3>
-          <a href={{post.link}} ng-show="post.link">{{post.title}}</a>
+          <a href="{{post.link}}" ng-show="post.link">{{post.title}}</a>
           <span ng-hide="post.link">{{post.title}}</span>
         </h3>
       </div>

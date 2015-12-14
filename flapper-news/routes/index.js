@@ -10,8 +10,8 @@ router.get('/', function(req, res, next) {
 var mongoose = require('mongoose');
 var Post = mongoose.model('Post');
 var Comment = mongoose.model('Comment');
-var passport = require('passport');
 var User = mongoose.model('User');
+var passport = require('passport');
 var jwt = require('express-jwt');
 var auth = jwt({secret: 'SECRET', userProperty: 'payload'});
 
@@ -87,10 +87,10 @@ router.post('/posts/:post/comments',auth, function(req, res, next) {
 
 //create route for upvote comment
 router.put('/posts/:post/comments/:comment/upvote',auth, function(req, res, next) {
-  req.post.upvote(function(err, post){
+  req.comment.upvote(function(err, comment){
     if (err) { return next(err); }
 
-    res.json(post);
+    res.json(comment);
   });
 });
 
